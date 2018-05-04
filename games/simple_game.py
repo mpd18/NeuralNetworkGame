@@ -5,52 +5,60 @@ import pygame, sys
 #import some useful constants
 from pygame.locals import *
 
+BLACK = (0,0,0)
+RED = (255,0,0)
+GREEN = (0,255,0)
+BLUE = (0,0,255)
+
+ROWS = 10
+COLUMNS = 10
+TILESIZE = 30
+
 class Player(object):
     
     def __init__(self):
-        self.rect = pygame.rect.Rect((150,280,20,20))
+        self.rect = pygame.rect.Rect((150,270,30,30))
         
     def handleMovement(self):
         key = pygame.key.get_pressed()
         
         if key[pygame.K_LEFT] and self.rect.left > 0:
            self.rect.move_ip(-10, 0)
-        if key[pygame.K_RIGHT] and self.rect.right < 300:
+        if key[pygame.K_RIGHT] and self.rect.right < COLUMNS*TILESIZE:
            self.rect.move_ip(10, 0)
            
     def draw(self):
-        pygame.draw.rect(screen, (0,255,255), self.rect)
+        pygame.draw.rect(screen, BLUE, self.rect)
         
 class Rock(object):
     def __init__(self,params):
         self.rect = pygame.rect.Rect(params)
-    def fall(self):
+    def fall(self,tiles):
         self.rect.move_ip(0,-10)
     def draw(self):
-        pygame.draw.rect(screen, (0,255,0), self.rect)
+        pygame.draw.rect(screen, RED, self.rect)
 
 class Point(object):
-    def __init__(self,params):
+    def __init__(self,column,tiles):
         self.rect = pygame.rect.Rect(params)
-    def fall(self):
+        tiles[0][column] = 
+    def fall(self,tiles):
         self.rect.move_ip(0,-10)
     def draw(self):
-        pygame.draw.rect(screen, (255,255,0), self.rect)
-    def draw(self):
-        pygame.draw.rect(screen, (0,0,0), self.rect)
+        pygame.draw.rect(screen, GREEN, self.rect)
         
 class backgroundTile(object):
     def __init__(self,params):
         self.rect = pygame.rect.Rect((params[0],params[1],10,10))
 
 #initiating the game tiles
-tiles = [[backgroundTile for i in range(10)] for j in range(10)]
+
 
 #initialise the pygame module
 pygame.init()
 
 #create a new drawing surface, width=300, height=300
-screen = pygame.display.set_mode((300,300))
+screen = pygame.display.set_mode((ROWS*TILESIZE,COLUMNS*TILESIZE))
 #give the window a caption
 pygame.display.set_caption('My First Game')
 
@@ -76,6 +84,8 @@ while True:
     pygame.display.update()
     
     clock.tick(20)
+    
+def drawTiles(tiles):
     
    
         
