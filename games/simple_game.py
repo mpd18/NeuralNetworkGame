@@ -52,13 +52,13 @@ class Pear(object):
     def draw(self,params):
         pygame.draw.rect(screen, GREEN, self.rect)
         
-class backgroundTile(object):
+class BackgroundTile(object):
     def __init__(self,params):
         self.rect = pygame.rect.Rect((params[0],params[1],TILESIZE,TILESIZE))
     def draw(self,objects):
         pygame.draw.rect(screen, WHITE, self.rect)
         
-class Objects(object):
+class Position(object):
     def __init__(self):
         self.positions = {"rocks" : [], "pears" : [], "player" = (ROWS-1,math.floor(COLUMNS/2))}
         
@@ -71,17 +71,34 @@ class GameTiles():
         for i in range(ROWS):
             row = []
             for j in range(COLUMNS):
-                tile = backgroundTile((x,y))
+                tile = backgroBackgroundTileundTile((x,y))
                 row.append(tile)
                 x += TILESIZE
             x = 0
             y += TILESIZE
             self.tiles.append(row)
-            
+        
+        self.positions = Position()
+    def addPear(self):
+        pass
+    def addRock(self):
+        pass
+    def addPlayer(self):
+        pass
+    def timeStep(self):
+        pass
     def draw(self,objects):
         for i in range(ROWS):
             for j in range(COLUMNS):
                 self.tiles[i][j].draw(objects)
+        
+                
+#flow of upating tiles
+"""
+1. get input from keyboard
+2. update object positions
+3. update game tiles
+"""
         
 if __name__ == "__main__":
     #initialise the pygame module
