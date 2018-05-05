@@ -84,7 +84,6 @@ class GameTiles():
                 self.tiles[i][j].draw(objects)
         
 if __name__ == "__main__":
-    print("yo")
     #initialise the pygame module
     pygame.init()
 
