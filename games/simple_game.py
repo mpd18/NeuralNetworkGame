@@ -1,6 +1,6 @@
 #import the pygame module, and the
 #sys module for exiting the window we create
-import pygame, sys, math
+import pygame, sys, math, random
 
 #import some useful constants
 from pygame.locals import *
@@ -11,14 +11,18 @@ GREEN = (0,255,0)
 BLUE = (0,0,255)
 WHITE = (255,255,255)
 
-ROWS = 20
-COLUMNS = 20
-TILESIZE = 60
+ROWS = 10
+COLUMNS = 10
+TILESIZE = 30
+PEARMAX = 3
+ROCKMAX = 3
 
 class Player(object):
     
-    def __init__(self):
-        self.rect = pygame.rect.Rect((150,270,TILESIZE,TILESIZE))
+    def __init__(self,xy):
+        self.x,self.y = xy
+        print(xy)
+        self.rect = pygame.rect.Rect((xy[0]*TILESIZE,xy[1]*TILESIZE,TILESIZE,TILESIZE))
         
     def handleMovement(self,objects):
         key = pygame.key.get_pressed()
@@ -27,42 +31,53 @@ class Player(object):
         y = objects["player"][1]
         
         if key[pygame.K_LEFT] and self.rect.left > 0:
-           objects["player"] = (x - TILESIZE, y-TILESIZE)
+           objects["player"] = (x - TILESIZE, y - TILESIZE)
         if key[pygame.K_RIGHT] and self.rect.right < COLUMNS*TILESIZE:
            objects["player"] = (x + TILESIZE, y + TILESIZE)
            
-    def draw(self,objects):
-        self.rect.x = xy[0]
-        self.rect.y = xy[1]
+    def draw(self):
+        self.rect.x = self.y * TILESIZE
+        self.rect.y = self.x * TILESIZE
         pygame.draw.rect(screen, BLUE, self.rect)
         
 class Rock(object):
-    def __init__(self,params):
-        self.rect = pygame.rect.Rect(params)
+
+    def __init__(self,xy,id=None):
+        self.id = id
+        self.x,self.y = xy
+        self.rect = pygame.rect.Rect((self.x*TILESIZE,self.y*TILESIZE,TILESIZE,TILESIZE))
+        
     def fall(self,tiles):
         self.rect.move_ip(0,-10)
+        
     def draw(self,params):
         pygame.draw.rect(screen, RED, self.rect)
 
 class Pear(object):
-    def __init__(self,column,tiles):
-        self.rect = pygame.rect.Rect(params)
+
+    def __init__(self,xy,id=None):
+        self.id = id
+        self.x,self.y = xy
+        self.rect = pygame.rect.Rect((self.x,self.y,TILESIZE,TILESIZE))
+        
     def fall(self,tiles):
         self.rect.move_ip(0,-10)
+        
     def draw(self,params):
         pygame.draw.rect(screen, GREEN, self.rect)
         
 class BackgroundTile(object):
-    def __init__(self,params):
-        self.rect = pygame.rect.Rect((params[0],params[1],TILESIZE,TILESIZE))
-    def draw(self,objects):
+
+    def __init__(self,xy,id=None):
+        self.id = id
+        self.x,self.y = xy
+        self.rect = pygame.rect.Rect((self.x,self.y,TILESIZE,TILESIZE))
+        
+    def draw(self):
         pygame.draw.rect(screen, WHITE, self.rect)
         
-class Position(object):
-    def __init__(self):
-        self.positions = {"rocks" : [], "pears" : [], "player" = (ROWS-1,math.floor(COLUMNS/2))}
-        
 class GameTiles():
+
     def __init__(self):
         #initiating the game tiles
         self.tiles = []
@@ -71,28 +86,65 @@ class GameTiles():
         for i in range(ROWS):
             row = []
             for j in range(COLUMNS):
-                tile = backgroBackgroundTileundTile((x,y))
+                tile = BackgroundTile((x,y))
                 row.append(tile)
                 x += TILESIZE
             x = 0
             y += TILESIZE
             self.tiles.append(row)
         
-        self.positions = Position()
+        self.playerPosition = None
+        self.rockPosition = [None] * ROCKMAX
+        self.pearPosition = [None] * PEARMAX
+        
     def addPear(self):
-        pass
+        column = random.randint(0,19)
+        
     def addRock(self):
         pass
+        
     def addPlayer(self):
-        pass
-    def timeStep(self):
-        pass
-    def draw(self,objects):
+        self.tiles[ROWS-1][math.ceil(COLUMNS/2)] = Player((ROWS-1,math.ceil(COLUMNS/2)))
+        self.playerPosition = (ROWS-1,math.ceil(COLUMNS/2))
+        
+    def movePlayer(self,direction):
+        row,column = self.playerPosition
+        #left
+        if direction == 0 and column > 0:
+            self.tiles[row][column].y -= 1
+            self.swapTiles((row,column),(row,column-1))
+            self.playerPosition = (row,column - 1)
+            print(self.tiles[row][column].x,self.tiles[row][column].y)
+        #right
+        if direction == 1 and column < COLUMNS-1:
+            self.tiles[row][column].y += 1
+            self.swapTiles((row,column),(row,column + 1))
+            self.playerPosition = (row,column + 1)
+            print(self.tiles[row][column].x,self.tiles[row][column].y)
+        
+    def swapTiles(self,xy1,xy2):
+        x1,y1 = xy1
+        x2,y2 = xy2
+        print(xy1)
+        print(xy2)
+        self.tiles[x1][y1], self.tiles[x2][y2] = self.tiles[x2][y2], self.tiles[x1][y1]
+        
+        
+    def draw(self):
         for i in range(ROWS):
             for j in range(COLUMNS):
-                self.tiles[i][j].draw(objects)
+                object = self.tiles[i][j]
+                object.draw()
+                    
+class Game(object):
+
+    def __init__(self):
+        self.tiles = GameTiles()
         
-                
+    #def timeStep(self):
+    #    for rock in 
+                    
+
 #flow of upating tiles
 """
 1. get input from keyboard
@@ -110,12 +162,10 @@ if __name__ == "__main__":
     pygame.display.set_caption('Pear Catch')
 
     clock = pygame.time.Clock()
-
-    #create player square
-    player = Player()
     
     tiles = GameTiles()
-    #loop (repeat) forever
+    tiles.addPlayer()
+    #loop forever
     while True:
 
         #get all the user events
@@ -125,6 +175,13 @@ if __name__ == "__main__":
                 #end the game and close the window
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    print("moving left")
+                    tiles.movePlayer(0)
+                elif event.key == pygame.K_RIGHT:
+                    print("moving right")
+                    tiles.movePlayer(1)
                 
         tiles.draw()
         #update the display        
