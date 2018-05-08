@@ -21,7 +21,7 @@ class Player(object):
     
     def __init__(self,xy):
         self.x,self.y = xy
-        self.rect = pygame.rect.Rect((xy[0]*TILESIZE,xy[1]*TILESIZE,TILESIZE,TILESIZE))
+        self.rect = pygame.rect.Rect((self.x*TILESIZE,self.y*TILESIZE,TILESIZE,TILESIZE))
            
     def draw(self):
         self.rect.x = self.x * TILESIZE
@@ -62,6 +62,8 @@ class BackgroundTile(object):
         self.rect = pygame.rect.Rect((self.x*TILESIZE,self.y*TILESIZE,TILESIZE,TILESIZE))
         
     def draw(self):
+        self.rect.x = self.x * TILESIZE
+        self.rect.y = self.y * TILESIZE
         pygame.draw.rect(screen, WHITE, self.rect)
         
 class GameTiles():
@@ -109,24 +111,9 @@ class GameTiles():
         x2,y2=xy2
 
         #swap the coordinates
-        """
-        playerx = self.tiles[x1][y1].x
-        playery = self.tiles[x1][y1].y
-        switchx = self.tiles[x2][y2].x
-        switchy = self.tiles[x2][y2].y
-        print(playerx,playery)
-        print(switchx,switchy)
-        """
         self.tiles[x1][y1].x, self.tiles[x2][y2].x = self.tiles[x2][y2].x, self.tiles[x1][y1].x
-        #self.tiles[x1][y1].y, self.tiles[x2][y2].y = self.tiles[x2][y2].y, self.tiles[x1][y1].y
-        #swap where they are in the array
         self.tiles[x1][y1], self.tiles[x2][y2] = self.tiles[x2][y2], self.tiles[x1][y1]
         self.playerPosition = (xy2)
-        
-        for row in self.tiles:
-            for tile in row:
-                print(tile)
-        
         
     def draw(self):
         for i in range(ROWS):
