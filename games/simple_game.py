@@ -21,23 +21,11 @@ class Player(object):
     
     def __init__(self,xy):
         self.x,self.y = xy
-        print(xy)
         self.rect = pygame.rect.Rect((xy[0]*TILESIZE,xy[1]*TILESIZE,TILESIZE,TILESIZE))
-        
-    def handleMovement(self,objects):
-        key = pygame.key.get_pressed()
-        
-        x = objects["player"][0]
-        y = objects["player"][1]
-        
-        if key[pygame.K_LEFT] and self.rect.left > 0:
-           objects["player"] = (x - TILESIZE, y - TILESIZE)
-        if key[pygame.K_RIGHT] and self.rect.right < COLUMNS*TILESIZE:
-           objects["player"] = (x + TILESIZE, y + TILESIZE)
            
     def draw(self):
-        self.rect.x = self.y * TILESIZE
-        self.rect.y = self.x * TILESIZE
+        self.rect.x = self.x * TILESIZE
+        self.rect.y = self.y * TILESIZE
         pygame.draw.rect(screen, BLUE, self.rect)
         
 class Rock(object):
@@ -58,7 +46,7 @@ class Pear(object):
     def __init__(self,xy,id=None):
         self.id = id
         self.x,self.y = xy
-        self.rect = pygame.rect.Rect((self.x,self.y,TILESIZE,TILESIZE))
+        self.rect = pygame.rect.Rect((self.x*TILESIZE,self.y*TILESIZE,TILESIZE,TILESIZE))
         
     def fall(self,tiles):
         self.rect.move_ip(0,-10)
@@ -71,7 +59,7 @@ class BackgroundTile(object):
     def __init__(self,xy,id=None):
         self.id = id
         self.x,self.y = xy
-        self.rect = pygame.rect.Rect((self.x,self.y,TILESIZE,TILESIZE))
+        self.rect = pygame.rect.Rect((self.x*TILESIZE,self.y*TILESIZE,TILESIZE,TILESIZE))
         
     def draw(self):
         pygame.draw.rect(screen, WHITE, self.rect)
@@ -88,9 +76,9 @@ class GameTiles():
             for j in range(COLUMNS):
                 tile = BackgroundTile((x,y))
                 row.append(tile)
-                x += TILESIZE
+                x += 1
             x = 0
-            y += TILESIZE
+            y += 1
             self.tiles.append(row)
         
         self.playerPosition = None
@@ -104,30 +92,40 @@ class GameTiles():
         pass
         
     def addPlayer(self):
-        self.tiles[ROWS-1][math.ceil(COLUMNS/2)] = Player((ROWS-1,math.ceil(COLUMNS/2)))
-        self.playerPosition = (ROWS-1,math.ceil(COLUMNS/2))
+        self.tiles[ROWS-1][math.ceil(COLUMNS/2)] = Player((math.ceil(COLUMNS/2),ROWS-1))
+        self.playerPosition = (ROWS-1,(math.ceil(COLUMNS/2)))
         
     def movePlayer(self,direction):
-        row,column = self.playerPosition
+        x,y = self.playerPosition
         #left
-        if direction == 0 and column > 0:
-            self.tiles[row][column].y -= 1
-            self.swapTiles((row,column),(row,column-1))
-            self.playerPosition = (row,column - 1)
-            print(self.tiles[row][column].x,self.tiles[row][column].y)
+        if direction == 0 and y > 0:
+            self.swapTiles((x,y),(x,y - 1))
         #right
-        if direction == 1 and column < COLUMNS-1:
-            self.tiles[row][column].y += 1
-            self.swapTiles((row,column),(row,column + 1))
-            self.playerPosition = (row,column + 1)
-            print(self.tiles[row][column].x,self.tiles[row][column].y)
+        elif direction == 1 and y < COLUMNS-1:
+            self.swapTiles((x,y),(x, y + 1))
         
     def swapTiles(self,xy1,xy2):
-        x1,y1 = xy1
-        x2,y2 = xy2
-        print(xy1)
-        print(xy2)
+        x1,y1=xy1
+        x2,y2=xy2
+
+        #swap the coordinates
+        """
+        playerx = self.tiles[x1][y1].x
+        playery = self.tiles[x1][y1].y
+        switchx = self.tiles[x2][y2].x
+        switchy = self.tiles[x2][y2].y
+        print(playerx,playery)
+        print(switchx,switchy)
+        """
+        self.tiles[x1][y1].x, self.tiles[x2][y2].x = self.tiles[x2][y2].x, self.tiles[x1][y1].x
+        #self.tiles[x1][y1].y, self.tiles[x2][y2].y = self.tiles[x2][y2].y, self.tiles[x1][y1].y
+        #swap where they are in the array
         self.tiles[x1][y1], self.tiles[x2][y2] = self.tiles[x2][y2], self.tiles[x1][y1]
+        self.playerPosition = (xy2)
+        
+        for row in self.tiles:
+            for tile in row:
+                print(tile)
         
         
     def draw(self):
@@ -165,6 +163,7 @@ if __name__ == "__main__":
     
     tiles = GameTiles()
     tiles.addPlayer()
+
     #loop forever
     while True:
 
@@ -177,10 +176,8 @@ if __name__ == "__main__":
                 sys.exit()
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    print("moving left")
                     tiles.movePlayer(0)
                 elif event.key == pygame.K_RIGHT:
-                    print("moving right")
                     tiles.movePlayer(1)
                 
         tiles.draw()
