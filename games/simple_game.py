@@ -12,7 +12,7 @@ BLUE = (0,0,255)
 WHITE = (255,255,255)
 
 ROWS = 10
-COLUMNS = 10
+COLUMNS = 30
 TILESIZE = 30
 PEARMAX = 3
 ROCKMAX = 3
@@ -85,7 +85,7 @@ class GameTiles():
         
         self.playerPosition = None
         self.rockPosition = [None] * ROCKMAX
-        self.pearPosition = [None] * PEARMAX
+        self.pearPosition = [None] * PEARMAX            
         
     def addPear(self):
         column = random.randint(0,19)
@@ -112,6 +112,7 @@ class GameTiles():
 
         #swap the coordinates
         self.tiles[x1][y1].x, self.tiles[x2][y2].x = self.tiles[x2][y2].x, self.tiles[x1][y1].x
+        self.tiles[x1][y1].y, self.tiles[x2][y2].y = self.tiles[x2][y2].y, self.tiles[x1][y1].y
         self.tiles[x1][y1], self.tiles[x2][y2] = self.tiles[x2][y2], self.tiles[x1][y1]
         self.playerPosition = (xy2)
         
@@ -120,29 +121,17 @@ class GameTiles():
             for j in range(COLUMNS):
                 object = self.tiles[i][j]
                 object.draw()
-                    
-class Game(object):
-
-    def __init__(self):
-        self.tiles = GameTiles()
+                
+    def timeStep(self):
         
-    #def timeStep(self):
-    #    for rock in 
                     
-
-#flow of upating tiles
-"""
-1. get input from keyboard
-2. update object positions
-3. update game tiles
-"""
         
 if __name__ == "__main__":
     #initialise the pygame module
     pygame.init()
 
     #create a new drawing surface, width=300, height=300
-    screen = pygame.display.set_mode((ROWS*TILESIZE,COLUMNS*TILESIZE))
+    screen = pygame.display.set_mode((COLUMNS*TILESIZE,ROWS*TILESIZE))
     #give the window a caption
     pygame.display.set_caption('Pear Catch')
 
@@ -171,5 +160,5 @@ if __name__ == "__main__":
         #update the display        
         pygame.display.update()
         
-        clock.tick(20)
+        clock.tick(60)
         
